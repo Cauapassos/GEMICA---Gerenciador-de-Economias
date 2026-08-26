@@ -1,0 +1,7 @@
+package br.com.dashboarddinheiro.DashboardDinheiro.controller;
+
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ReceitaController {
+}

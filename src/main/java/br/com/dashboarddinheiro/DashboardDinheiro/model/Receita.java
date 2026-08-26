@@ -1,0 +1,54 @@
+package br.com.dashboarddinheiro.DashboardDinheiro.model;
+
+
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "receita")
+public class Receita {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nome;
+
+    private String descricao;
+
+    private BigDecimal valor;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Receita(){}
+
+    public Receita(String nome, String descricao, BigDecimal valor){
+        this.nome = nome;
+        this.descricao = descricao;
+        this.valor = valor;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+
+    public BigDecimal getValor(){
+        return valor;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
+    }
+
+}
