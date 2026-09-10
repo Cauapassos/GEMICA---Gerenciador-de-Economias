@@ -24,11 +24,11 @@ public class Despesa {
     private String descricao;
 
 
-    private BigDecimal valor;
+    private Double valor;
 
     public Despesa(){}
 
-    public Despesa(String nome, String tipo, BigDecimal valor, String descricao, Date data) {
+    public Despesa(String nome, String tipo, Double valor, String descricao, Date data) {
         this.descricao = descricao;
         this.nome = nome;
         this.valor = valor;
@@ -46,11 +46,11 @@ public class Despesa {
         return id;
     }
 
-    public BigDecimal getValor() {
+    public Double getValor() {
         return valor;
     }
 
-    public void setValor(BigDecimal valor) {
+    public void setValor(Double valor) {
         this.valor = valor;
     }
 

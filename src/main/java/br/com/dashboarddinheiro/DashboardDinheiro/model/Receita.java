@@ -3,7 +3,6 @@ package br.com.dashboarddinheiro.DashboardDinheiro.model;
 
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "receita")
@@ -16,7 +15,7 @@ public class Receita {
 
     private String descricao;
 
-    private BigDecimal valor;
+    private Double valor;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -24,7 +23,7 @@ public class Receita {
 
     public Receita(){}
 
-    public Receita(String nome, String descricao, BigDecimal valor){
+    public Receita(String nome, String descricao, Double valor){
         this.nome = nome;
         this.descricao = descricao;
         this.valor = valor;
@@ -39,7 +38,7 @@ public class Receita {
     }
 
 
-    public BigDecimal getValor(){
+    public Double getValor(){
         return valor;
     }
 
@@ -47,7 +46,7 @@ public class Receita {
         return id;
     }
 
-    public void setValor(BigDecimal valor) {
+    public void setValor(Double valor) {
         this.valor = valor;
     }
 
