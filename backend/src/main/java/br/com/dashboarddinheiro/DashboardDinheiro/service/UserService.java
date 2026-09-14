@@ -20,5 +20,16 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public User salvar(User user){
+        return userRepository.save(user);
+    }
+
+    public User atualizar(Long id, User dadosNovos){
+        User usuario = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario nao encotrnado"));
+        userRepository.findById(id);
+        usuario.setEmail(usuario.getEmail());
+        usuario.setSaldo(usuario.getSaldo());
+        return userRepository.save(usuario);
+    }
 
 }

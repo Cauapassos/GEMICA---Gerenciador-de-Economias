@@ -44,4 +44,12 @@ public class User {
     public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
     }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
