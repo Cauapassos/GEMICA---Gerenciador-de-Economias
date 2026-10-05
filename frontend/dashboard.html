@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEMICA - Dashboard</title>
+    <script>
+        // Aplica o tema salvo antes de desenhar a página (evita piscar)
+        (function () {
+            var salvo = null;
+            try { salvo = localStorage.getItem('gemicaTheme'); } catch (e) { }
+            var escuro = salvo ? salvo === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', escuro ? 'dark' : 'light');
+        })();
+    </script>
+    <link rel="stylesheet" href="styleDashboard.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container header-flex">
+            <div>
+                <h1 class="header-title">GEMICA</h1>
+                <p class="header-subtitle">Gerenciador de Despesas e Economias</p>
+            </div>
+            <span id="headerMonth" class="header-month"></span>
+        </div>
+    </header>
+
+    <div class="app">
+    <!-- Barra lateral -->
+    <aside class="sidebar">
+        <div class="sidebar-inner">
+            <nav class="sidebar-nav">
+                <button type="button" class="nav-btn nav-btn-active" data-section="overview">Visão geral</button>
+                <button type="button" class="nav-btn" data-section="income">Receitas</button>
+                <button type="button" class="nav-btn" data-section="expense">Despesas</button>
+                <button type="button" class="nav-btn" data-section="report">Relatório do mês</button>
+            </nav>
+
+            <label class="theme-toggle" for="themeToggle">
+                <span class="switch">
+                    <input type="checkbox" id="themeToggle" role="switch">
+                    <span class="slider"></span>
+                </span>
+                <span>Modo escuro</span>
+            </label>
+
+            <div class="sidebar-card">
+                <p class="stat-label">Economizado no mês</p>
+                <p class="stat-value balance" id="sideSavedValue">R$ 0,00</p>
+                <div class="bar-track"><div class="bar-fill bar-saved" id="sideSavedBar"></div></div>
+                <p class="card-note" id="sideSavedNote"></p>
+                <button type="button" class="btn btn-secondary btn-full" id="logoutBtn">Sair</button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        <div class="container">
+            <div id="messageContainer" class="message-container"></div>
+
+            <!-- Visão geral -->
+            <section id="overviewSection" class="section section-active">
+                <div class="card welcome">
+                    <div id="avatar" class="avatar" aria-hidden="true"></div>
+                    <div class="welcome-text">
+                        <h2 id="welcomeTitle" class="welcome-title">Olá, seja bem vindo novamente</h2>
+                        <p class="welcome-subtitle">Veja como estão suas finanças.</p>
+                    </div>
+                    <div class="welcome-actions">
+                        <button type="button" class="btn btn-success js-open-income">Registrar nova receita</button>
+                        <button type="button" class="btn btn-danger js-open-expense">Registrar despesa</button>
+                    </div>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="card card-balance">
+                        <p class="stat-label">Saldo atual</p>
+                        <p class="stat-value balance" id="balanceValue">R$ 0,00</p>
+                    </div>
+                    <div class="card">
+                        <p class="stat-label">Total de receitas</p>
+                        <p class="stat-value positive" id="totalIncome">R$ 0,00</p>
+                    </div>
+                    <div class="card">
+                        <p class="stat-label">Total de gastos</p>
+                        <p class="stat-value negative" id="totalExpense">R$ 0,00</p>
+                    </div>
+                    <div class="card">
+                        <p class="stat-label">Economizado no mês</p>
+                        <p class="stat-value balance" id="savedValue">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="card">
+                        <h2 class="card-title">Resumo do mês</h2>
+                        <div id="chart"></div>
+                        <p class="card-note">Receita livre = receitas do mês menos despesas fixas ativas.
+                            Economizado = receitas do mês menos todos os gastos do mês.</p>
+                    </div>
+                    <div class="card">
+                        <h2 class="card-title">Gastos por categoria</h2>
+                        <div class="donut-wrap">
+                            <div class="donut" id="donut">
+                                <div class="donut-center">
+                                    <strong id="donutTotal">R$ 0,00</strong>
+                                    <span>no mês</span>
+                                </div>
+                            </div>
+                            <ul class="legend" id="donutLegend"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-row">
+                    <div class="card">
+                        <h2 class="card-title">Movimentações recentes</h2>
+                        <ul class="list" id="recentList"></ul>
+                    </div>
+                    <div class="card">
+                        <h2 class="card-title">Destaques do mês</h2>
+                        <ul class="list" id="highlights"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Receitas -->
+            <section id="incomeSection" class="section">
+                <div class="card">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="card-title">Receitas</h2>
+                            <p id="incomeSummary" class="stat-label"></p>
+                        </div>
+                        <button type="button" class="btn btn-success js-open-income">Registrar nova receita</button>
+                    </div>
+                    <ul class="list" id="incomeList"></ul>
+                </div>
+            </section>
+
+            <!-- Despesas por categoria -->
+            <section id="expenseSection" class="section">
+                <div class="card">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="card-title">Despesas por categoria</h2>
+                            <p id="expenseSummary" class="stat-label"></p>
+                        </div>
+                        <button type="button" class="btn btn-danger js-open-expense">Registrar despesa</button>
+                    </div>
+                </div>
+                <div id="expenseGroups" class="category-groups"></div>
+            </section>
+
+            <!-- Relatório do mês -->
+            <section id="reportSection" class="section">
+                <div id="reportContainer" class="report"></div>
+            </section>
+        </div>
+    </main>
+    </div>
+
+    <!-- Modal: nova receita -->
+    <div id="incomeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar nova receita</h3>
+                <button type="button" class="modal-close" data-close aria-label="Fechar">&times;</button>
+            </div>
+            <form id="incomeForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="incomeName" class="form-label">Nome</label>
+                        <input type="text" id="incomeName" class="form-input" placeholder="Ex: Salário" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeValue" class="form-label">Valor</label>
+                        <input type="number" id="incomeValue" class="form-input" placeholder="R$ 0,00" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeDate" class="form-label">Data</label>
+                        <input type="date" id="incomeDate" class="form-input" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="saveIncomeBtn">Salvar receita</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: nova despesa -->
+    <div id="expenseModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar despesa</h3>
+                <button type="button" class="modal-close" data-close aria-label="Fechar">&times;</button>
+            </div>
+            <form id="expenseForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <span class="form-label">Tipo de despesa</span>
+                        <div class="radio-group">
+                            <label class="radio-option"><input type="radio" name="tipo" value="UNICA" checked> Única</label>
+                            <label class="radio-option"><input type="radio" name="tipo" value="FIXA"> Fixa</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseName" class="form-label">Nome</label>
+                        <input type="text" id="expenseName" class="form-input" placeholder="Ex: Aluguel" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseValue" class="form-label">Valor</label>
+                        <input type="number" id="expenseValue" class="form-input" placeholder="R$ 0,00" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseCategory" class="form-label">Categoria</label>
+                        <select id="expenseCategory" class="form-input">
+                            <option>Alimentação</option>
+                            <option>Transporte</option>
+                            <option>Moradia</option>
+                            <option>Lazer</option>
+                            <option>Educação</option>
+                            <option>Saúde</option>
+                            <option>Assinaturas</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+
+                    <div id="uniqueFields" class="form-group">
+                        <label for="expenseDate" class="form-label">Data</label>
+                        <input type="date" id="expenseDate" class="form-input">
+                    </div>
+
+                    <div id="fixedFields" class="date-row hidden">
+                        <div class="form-group">
+                            <label for="expenseStart" class="form-label">Data de início</label>
+                            <input type="date" id="expenseStart" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseEnd" class="form-label">Data de fim</label>
+                            <input type="date" id="expenseEnd" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close>Cancelar</button>
+                    <button type="submit" class="btn btn-danger" id="saveExpenseBtn">Salvar despesa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

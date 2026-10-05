@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEMICA - Gerenciador de Despesas</title>
+    <script>
+        // Aplica o tema salvo antes de desenhar a página (evita piscar)
+        (function () {
+            var salvo = null;
+            try { salvo = localStorage.getItem('gemicaTheme'); } catch (e) { }
+            var escuro = salvo ? salvo === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', escuro ? 'dark' : 'light');
+        })();
+    </script>
     <link rel="stylesheet" href="styleLogin.css">
 </head>
 
@@ -17,124 +26,56 @@
         </div>
     </header>
 
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-container">
-            <button type="button" class="nav-btn nav-btn-active" data-section="create">
-                Criar Usuário
-            </button>
-            <button type="button" class="nav-btn" data-section="list">
-                Listar Usuários
-            </button>
-            <div class="api-config-nav">
-                <label for="apiUrlNav" class="api-label">API:</label>
-                <input type="text" id="apiUrlNav" class="api-input-nav" value="http://localhost:8080">
+    <div class="app">
+        <!-- Barra lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+                <label class="theme-toggle" for="themeToggle">
+                    <span class="switch">
+                        <input type="checkbox" id="themeToggle" role="switch">
+                        <span class="slider"></span>
+                    </span>
+                    <span>Modo escuro</span>
+                </label>
             </div>
-        </div>
-    </nav>
+        </aside>
 
-    <!-- Main Content -->
-    <main class="main-container">
-        <div class="container">
-            <!-- Messages -->
-            <div id="messageContainer" class="message-container"></div>
+        <!-- Conteúdo -->
+        <main class="main-container">
+            <div class="container">
+                <div id="messageContainer" class="message-container"></div>
 
-            <!-- Create User Section -->
-            <section id="createSection" class="section section-active">
-                <div class="card">
+                <section class="card">
                     <h2 class="card-title">Criar Novo Usuário</h2>
+                    <p class="card-subtitle">Ao criar sua conta você entra direto no seu dashboard.</p>
 
                     <form id="createUserForm">
                         <div class="form-group">
                             <label for="userName" class="form-label">Nome</label>
                             <input type="text" id="userName" class="form-input" placeholder="Digite o nome completo"
-                                required>
+                                autocomplete="name" required>
                         </div>
 
                         <div class="form-group">
                             <label for="userEmail" class="form-label">Email</label>
-                            <input type="email" id="userEmail" class="form-input" placeholder="seu@email.com" required>
+                            <input type="email" id="userEmail" class="form-input" placeholder="seu@email.com"
+                                autocomplete="email" required>
                         </div>
 
                         <div class="form-group">
                             <label for="userPassword" class="form-label">Senha</label>
-                            <input type="password" id="userPassword" class="form-input" placeholder="••••••••" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="userBalance" class="form-label">Saldo</label>
-                            <input type="number" id="userBalance" class="form-input" placeholder="R$ 0,00" step="0.01"
-                                required>
+                            <input type="password" id="userPassword" class="form-input" placeholder="Mínimo de 6 caracteres"
+                                autocomplete="new-password" minlength="6" required>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-full" id="createBtn">
                             Criar Usuário
                         </button>
                     </form>
-                </div>
-            </section>
-
-            <!-- List Users Section -->
-            <section id="listSection" class="section">
-                <div class="card">
-                    <div class="section-header">
-                        <h2 class="card-title">Listar Usuários</h2>
-                        <button type="button" class="btn btn-secondary" id="refreshListBtn">
-                            ↻ Atualizar
-                        </button>
-                    </div>
-
-                    <div id="usersTableContainer" class="table-container">
-                        <p class="loading-text">Clique em "Atualizar" para carregar os usuários</p>
-                    </div>
-                </div>
-
-                <!-- Edit Modal -->
-                <div id="editModal" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3 class="modal-title">Editar Usuário</h3>
-                            <button type="button" class="modal-close" id="closeModalBtn">&times;</button>
-                        </div>
-
-                        <form id="editUserForm">
-                            <input type="hidden" id="editUserId">
-
-                            <div class="form-group">
-                                <label for="editUserName" class="form-label">Nome</label>
-                                <input type="text" id="editUserName" class="form-input" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="editUserEmail" class="form-label">Email</label>
-                                <input type="email" id="editUserEmail" class="form-input" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="editUserPassword" class="form-label">Senha</label>
-                                <input type="password" id="editUserPassword" class="form-input"
-                                    placeholder="Deixe em branco para não alterar">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="editUserBalance" class="form-label">Saldo</label>
-                                <input type="number" id="editUserBalance" class="form-input" step="0.01" required>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" id="cancelEditBtn">
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-primary" id="saveEditBtn">
-                                    Salvar Alterações
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
+                </section>
+            </div>
+        </main>
+    </div>
 
     <script src="login.js"></script>
 </body>
